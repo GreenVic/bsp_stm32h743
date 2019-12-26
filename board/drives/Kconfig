@@ -1,0 +1,82 @@
+menu "UART"
+    config BSP_ENABLE_UART
+        bool "Enable uart drive"
+        select RT_USING_SERIAL
+        default n      
+
+    config BSP_UART_ENABLE_PORT3
+        bool "Enable uart3 port"
+        depends on BSP_ENABLE_UART
+        default n    
+endmenu
+
+menu "PIN"
+    config BSP_ENABLE_PIN
+        bool "Enable pin drive"
+        select RT_USING_PIN
+        default n       
+endmenu
+
+menu "SDCRAD"
+    config BSP_ENABLE_SDCARD
+        bool "Enable sdcard drive" 
+        default n 
+        select RT_USING_DFS
+        select RT_USING_DFS_ELMFAT
+
+    config BSP_SDCARD_ENABLE_AUTO_MOUNT
+        bool "Enable sdcard auto mount mode" 
+        default n 
+        depends on BSP_ENABLE_SDCARD
+    
+    config BSP_SDCARD_CONFIG_MOUNT_POINT
+        string "Mount point"
+        default "/mnt/sdcard" 
+        depends on BSP_SDCARD_ENABLE_AUTO_MOUNT
+endmenu
+
+menu "SPI"
+    config BSP_ENABLE_SPI
+        bool "Enable spi bus drive"
+        select RT_USING_SPI
+        default n     
+
+    config BSP_SPI_ENABLE_PORT3
+        bool "Enable spi3 bus port"
+        depends on BSP_ENABLE_SPI
+        default n   
+
+    config BSP_SPI_ENABLE_PORT4
+        bool "Enable spi4 bus port"
+        depends on BSP_ENABLE_SPI
+        default n        
+endmenu
+
+menu "LCD"
+    config BSP_ENABLE_LCD
+        bool "Enable lcd drive"
+        select RT_USING_SPI
+        select BSP_SPI_ENABLE_PORT3
+        default n       
+endmenu
+
+menu "WIFI"
+    config BSP_ENABLE_WIFI
+        bool "Enable wifi drive" 
+        default n 
+        select RT_USING_LWIP
+        select BSP_ENABLE_SPI
+        select BSP_SPI_ENABLE_PORT4
+endmenu 
+
+menu "PSRAM"
+    config BSP_ENABLE_PSRAM
+        bool "Enable psram drive" 
+        default n 
+endmenu 
+
+menu "USBD"
+    config BSP_ENABLE_USBD
+        bool "Enable usbd drive" 
+        default n 
+endmenu 

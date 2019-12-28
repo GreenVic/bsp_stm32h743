@@ -4,8 +4,8 @@ menu "UART"
         select RT_USING_SERIAL
         default n      
 
-    config BSP_UART_ENABLE_PORT3
-        bool "Enable uart3 port"
+    config BSP_UART_ENABLE_PORT1
+        bool "Enable uart1 port"
         depends on BSP_ENABLE_UART
         default n    
 endmenu

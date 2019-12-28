@@ -10,7 +10,8 @@ int main(void)
 {      
 	while(1)
 	{
-		
+		rt_thread_delay(1000);
+		rt_kprintf("RT-Thread\n");
 	}
     return 0; 
 }

@@ -12,7 +12,7 @@
 
 /* RTTGameBoard drivers */ 
 #if defined(BSP_ENABLE_PIN)
-#include "drv_pin.h"
+#include "drv_gpio.h"
 #endif 
 
 #if defined(BSP_ENABLE_UART)

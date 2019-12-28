@@ -139,9 +139,9 @@ void rt_hw_board_init(void)
     rt_components_board_init();
 #endif
 
-// #ifdef RT_USING_CONSOLE
-//     rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
-// #endif
+#ifdef RT_USING_CONSOLE
+    rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
+#endif
 
 #if defined(RT_USING_MEMHEAP_AS_HEAP)
     rt_system_heap_init(BOARD_HEAP_BEGIN, BOARD_HEAP_END);

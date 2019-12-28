@@ -75,7 +75,7 @@ if GetDepend(['BSP_ENABLE_UART']):
 
 if GetDepend(['BSP_ENABLE_PIN']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'pin')] 
-    SOURCES += ['pin/drv_pin.c']
+    SOURCES += ['pin/drv_gpio.c']
 
 if GetDepend(['BSP_ENABLE_SDCARD']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'sdcard')] 

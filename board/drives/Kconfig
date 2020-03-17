@@ -75,6 +75,13 @@ menu "PSRAM"
         default n 
 endmenu 
 
+menu "HWTIMER"
+    config BSP_ENABLE_HWTIMER
+        bool "Enable hwtimer drive"
+        select RT_USING_HWTIMER
+        default n       
+endmenu
+
 menu "USBD"
     config BSP_ENABLE_USBD
         bool "Enable usbd drive" 

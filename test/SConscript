@@ -15,7 +15,7 @@ Import('rtconfig')
 #---------------------------------------------------------------------------------
 # Package configuration
 #---------------------------------------------------------------------------------
-PKGNAME = "Board"
+PKGNAME = "Application"
 VERSION = "1.0.0"
 DEPENDS = [""]
 
@@ -41,15 +41,13 @@ DEPENDS = [""]
 #
 # LINKFLAGS: Link options
 #---------------------------------------------------------------------------------
-# SOURCES          = ["cache/drv_cache.c", "flash/drv_flash.c"]  
-SOURCES          = []  
+SOURCES          = [] + Glob('*.c')
 
 LOCAL_CPPPATH    = [] 
 LOCAL_CCFLAGS    = "" 
 LOCAL_ASFLAGS    = ""
 
-#CPPPATH          = [os.path.join(GetCurrentDir(), 'romfs')] 
-CPPPATH          = [] 
+CPPPATH          = [GetCurrentDir()] 
 CCFLAGS          = "" 
 ASFLAGS          = ""
 
@@ -65,46 +63,6 @@ LINKFLAGS        = ""
 # Feature clip configuration, optional 
 #---------------------------------------------------------------------------------
 
-if GetDepend(['RT_USING_DFS']) and GetDepend(['RT_USING_DFS_ROMFS']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'romfs')] 
-    SOURCES += ['romfs/drv_romfs.c']
-
-if GetDepend(['BSP_ENABLE_UART']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'uart')] 
-    SOURCES += ['uart/drv_usart.c']
-
-if GetDepend(['BSP_ENABLE_PIN']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'pin')] 
-    SOURCES += ['pin/drv_gpio.c']
-
-if GetDepend(['BSP_ENABLE_SDCARD']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'sdcard')] 
-    SOURCES += ['sdcard/drv_sdcard.c']
-
-if GetDepend(['BSP_ENABLE_SPI']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'spi')] 
-    SOURCES += ['spi/drv_spi.c']
-
-if GetDepend(['BSP_ENABLE_LCD']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'lcd')] 
-    SOURCES += ['lcd/drv_lcd.c']
-
-if GetDepend(['BSP_ENABLE_WIFI']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'wifi')] 
-    SOURCES += ['wifi/drv_wifi.c', 'wifi/drv_wifi_port.c']
-
-if GetDepend(['BSP_ENABLE_PSRAM']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'psram')] 
-    SOURCES += ['psram/drv_psram.c']
-
-if GetDepend(['BSP_ENABLE_USBD']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'usb')] 
-    SOURCES += ['usb/drv_usbd.c']
-
-if GetDepend(['BSP_ENABLE_HWTIMER']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'hwtimer')] 
-    SOURCES += ['hwtimer/drv_hwtimer.c']
-
 #---------------------------------------------------------------------------------
 # Compiler platform configuration, optional
 #---------------------------------------------------------------------------------
@@ -116,18 +74,8 @@ if GetDepend(['BSP_ENABLE_HWTIMER']):
 #---------------------------------------------------------------------------------
 # System variables
 #---------------------------------------------------------------------------------
-objs = [] 
-root = GetCurrentDir() 
-
-#---------------------------------------------------------------------------------
-# Sub target
-#---------------------------------------------------------------------------------
-list = os.listdir(root)
-if GetDepend(DEPENDS):
-    for d in list:
-        path = os.path.join(root, d)
-        if os.path.isfile(os.path.join(path, 'SConscript')):
-            objs = objs + SConscript(os.path.join(d, 'SConscript')) 
+objs   = [] 
+root   = GetCurrentDir() 
 
 #---------------------------------------------------------------------------------
 # Main target
@@ -145,7 +93,18 @@ objs = DefineGroup(name = PKGNAME, src = SOURCES, depend = DEPENDS,
                    LIBPATH          = LIBPATH,
                    LINKFLAGS        = LINKFLAGS)  
 
+#---------------------------------------------------------------------------------
+# Sub target
+#---------------------------------------------------------------------------------
+list = os.listdir(root)
+if GetDepend(DEPENDS):
+    for d in list:
+        path = os.path.join(root, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            objs = objs + SConscript(os.path.join(d, 'SConscript')) 
+
 Return("objs") 
 #---------------------------------------------------------------------------------
 # End
 #---------------------------------------------------------------------------------
+

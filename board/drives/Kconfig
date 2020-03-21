@@ -82,6 +82,13 @@ menu "HWTIMER"
         default n       
 endmenu
 
+menu "PWM"
+    config BSP_ENABLE_PWM
+        bool "Enable hwtimer drive"
+        select RT_USING_PWM
+        default n       
+endmenu
+
 menu "USBD"
     config BSP_ENABLE_USBD
         bool "Enable usbd drive" 

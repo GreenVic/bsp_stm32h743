@@ -105,6 +105,10 @@ if GetDepend(['BSP_ENABLE_HWTIMER']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'hwtimer')] 
     SOURCES += ['hwtimer/drv_hwtimer.c']
 
+if GetDepend(['BSP_ENABLE_PWM']):
+    CPPPATH += [os.path.join(GetCurrentDir(), 'pwm')] 
+    SOURCES += ['pwm/drv_pwm.c']
+
 #---------------------------------------------------------------------------------
 # Compiler platform configuration, optional
 #---------------------------------------------------------------------------------

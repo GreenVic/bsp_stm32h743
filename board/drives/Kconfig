@@ -89,6 +89,12 @@ menu "PWM"
         default n       
 endmenu
 
+menu "FMC"
+    config BSP_ENABLE_FMC
+        bool "Enable fmc drive"
+        default n       
+endmenu
+
 menu "USBD"
     config BSP_ENABLE_USBD
         bool "Enable usbd drive" 

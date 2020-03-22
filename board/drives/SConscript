@@ -109,6 +109,10 @@ if GetDepend(['BSP_ENABLE_PWM']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'pwm')] 
     SOURCES += ['pwm/drv_pwm.c']
 
+if GetDepend(['BSP_ENABLE_FMC']):
+    CPPPATH += [os.path.join(GetCurrentDir(), 'fmc')] 
+    SOURCES += ['fmc/drv_fmc.c']
+
 #---------------------------------------------------------------------------------
 # Compiler platform configuration, optional
 #---------------------------------------------------------------------------------

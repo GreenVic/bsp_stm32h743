@@ -121,6 +121,57 @@ void HAL_MspInit(void)
     HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
 
+static void MPU_Config( void )
+{
+	MPU_Region_InitTypeDef MPU_InitStruct;
+
+	/* 禁止 MPU */
+	HAL_MPU_Disable();
+
+	/* 配置AXI SRAM的MPU属性为Write back, Read allocate，Write allocate */
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0x24000000;
+	MPU_InitStruct.Size             = MPU_REGION_SIZE_512KB;
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER0;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+	
+	
+	/* 配置FMC扩展IO的MPU属性为Device或者Strongly Ordered */
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0x60000000;
+	MPU_InitStruct.Size             = MPU_REGION_SIZE_64KB;	
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;	/* 不能用MPU_ACCESS_CACHEABLE，会出现2次CS、WE信号 */
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER1;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+	/*使能 MPU */
+	HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+}
+
+static void CPU_CACHE_Enable(void)
+{
+	/* 使能 I-Cache */
+	SCB_EnableICache();
+
+	/* 使能 D-Cache */
+	SCB_EnableDCache();
+}
+
 void rt_hw_board_init(void)
 {
     /* Hardware floating point support */ 
@@ -131,9 +182,15 @@ void rt_hw_board_init(void)
     /* Redefine interrupt vector table: ext qspi flash */ 
     // SCB->VTOR = (uint32_t)(0x90000000); 
 
+	MPU_Config();
+
+	/* 使能L1 Cache */
+	CPU_CACHE_Enable();
+
+	HAL_Init();
+
     /* Configure the system clock @ 400 MHz */
     SystemClock_Config(); 
-    HAL_Init();
 
 #ifdef RT_USING_COMPONENTS_INIT
     rt_components_board_init();

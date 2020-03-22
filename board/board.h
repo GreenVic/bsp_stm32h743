@@ -78,4 +78,3 @@
 #define BOARD_HEAP_SIZE   (((rt_uint32_t)(BOARD_HEAP_END))-((rt_uint32_t)(BOARD_HEAP_BEGIN)))
 
 #endif
-

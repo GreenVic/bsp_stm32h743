@@ -35,6 +35,7 @@
 /* Memory Management */
 
 #define RT_USING_MEMPOOL
+#define RT_USING_MEMHEAP
 #define RT_USING_SMALL_MEM
 #define RT_USING_HEAP
 
@@ -195,6 +196,10 @@
 /* FMC */
 
 #define BSP_ENABLE_FMC
+
+/* SDRAM */
+
+#define BSP_ENABLE_SDRAM
 
 /* USBD */
 

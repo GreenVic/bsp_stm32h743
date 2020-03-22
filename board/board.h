@@ -39,6 +39,10 @@
 #include "drv_psram.h"
 #endif 
 
+#if defined(BSP_ENABLE_SDRAM)
+#include "drv_sdram.h"
+#endif 
+
 /* RTTGameBoard pin number */ 
 #define STM32_PIN_NUM   (100)
 
@@ -76,5 +80,12 @@
 #define BOARD_HEAP_BEGIN  (void *)(HEAP_BEGIN)
 #define BOARD_HEAP_END    (void *)(BOARD_SRAM1_END)
 #define BOARD_HEAP_SIZE   (((rt_uint32_t)(BOARD_HEAP_END))-((rt_uint32_t)(BOARD_HEAP_BEGIN)))
+
+#define BOARD_SDRAM_BEGIN ((void *)0xC0000000)
+#define BOARD_SDRAM_SIZE  (32 * 1024 * 1024)
+
+void sdram_init(void);
+void* sdram_malloc(unsigned long size);
+void sdram_free(void *ptr);
 
 #endif

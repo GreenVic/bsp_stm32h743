@@ -11,6 +11,8 @@
 static struct rt_memheap system_heap;
 #endif
 
+static struct rt_memheap sdram_heap;
+
 void SystemClock_Config(void)
 {
 	RCC_ClkInitTypeDef RCC_ClkInitStruct;
@@ -107,6 +109,21 @@ void HAL_ResumeTick(void)
     /* we should not resume tick */
 }
 
+void sdram_init(void)
+{
+	rt_memheap_init(&sdram_heap, "sdram", BOARD_SDRAM_BEGIN, BOARD_SDRAM_SIZE);
+}
+
+void* sdram_malloc(unsigned long size)
+{
+	return rt_memheap_alloc(&sdram_heap, size);
+}
+
+void sdram_free(void *ptr)
+{
+	rt_memheap_free(ptr);
+}
+
 void HAL_MspInit(void)
 {
     __HAL_RCC_SYSCFG_CLK_ENABLE();
@@ -150,13 +167,28 @@ static void MPU_Config( void )
 	MPU_InitStruct.Size             = MPU_REGION_SIZE_64KB;	
 	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
 	MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
-	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;	/* 不能用MPU_ACCESS_CACHEABLE，会出现2次CS、WE信号 */
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;	/* 不能用MPU_ACCESS_CACHEABLE;会出现2次CS、WE信号 */
 	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
 	MPU_InitStruct.Number           = MPU_REGION_NUMBER1;
 	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
 	MPU_InitStruct.SubRegionDisable = 0x00;
 	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
 	
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+    
+    /* 配置SDRAM的MPU属性为Write back, Read allocate，Write allocate */
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0xC0000000;
+	MPU_InitStruct.Size             = MPU_REGION_SIZE_32MB;
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER2;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
 	/*使能 MPU */

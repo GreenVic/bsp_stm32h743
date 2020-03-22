@@ -15,7 +15,6 @@
 #include <rtdevice.h>
 #include <board.h>
 
-
 #include "drv_hwtimer.h"
 
 #define DBG_ENABLE

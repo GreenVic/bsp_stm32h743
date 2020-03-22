@@ -113,6 +113,10 @@ if GetDepend(['BSP_ENABLE_FMC']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'fmc')] 
     SOURCES += ['fmc/drv_fmc.c']
 
+if GetDepend(['BSP_ENABLE_SDRAM']):
+    CPPPATH += [os.path.join(GetCurrentDir(), 'sdram')] 
+    SOURCES += ['sdram/drv_sdram.c']
+
 #---------------------------------------------------------------------------------
 # Compiler platform configuration, optional
 #---------------------------------------------------------------------------------

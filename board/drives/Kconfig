@@ -41,15 +41,10 @@ menu "SPI"
         select RT_USING_SPI
         default n     
 
-    config BSP_SPI_ENABLE_PORT3
-        bool "Enable spi3 bus port"
+    config BSP_SPI_ENABLE_PORT1
+        bool "Enable spi1 bus port"
         depends on BSP_ENABLE_SPI
         default n   
-
-    config BSP_SPI_ENABLE_PORT4
-        bool "Enable spi4 bus port"
-        depends on BSP_ENABLE_SPI
-        default n        
 endmenu
 
 menu "LCD"

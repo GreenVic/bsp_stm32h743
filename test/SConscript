@@ -77,6 +77,15 @@ LINKFLAGS        = ""
 objs   = [] 
 root   = GetCurrentDir() 
 
+if not GetDepend('BSP_ENABLE_HWTIMER'):
+    SrcRemove(SOURCES, ['hwtimer_test.c'])
+
+if not GetDepend('BSP_ENABLE_FMC'):
+    SrcRemove(SOURCES, ['fmc_test.c'])
+
+if not GetDepend('BSP_ENABLE_SDRAM'):
+    SrcRemove(SOURCES, ['sdram_test.c'])
+
 #---------------------------------------------------------------------------------
 # Main target
 #---------------------------------------------------------------------------------

@@ -33,39 +33,21 @@ struct stm32_spi_cs
     rt_uint32_t pin;
 };
 
-#if defined(BSP_SPI_ENABLE_PORT3)
-static struct stm32_spi spi3 = {.hspi.Instance = SPI3}; 
-static struct rt_spi_bus spi3_bus = {.parent.user_data = &spi3}; 
-#endif
-
-#if defined(BSP_SPI_ENABLE_PORT4)
-static struct stm32_spi spi4 = {.hspi.Instance = SPI4}; 
-static struct rt_spi_bus spi4_bus = {.parent.user_data = &spi4}; 
+#if defined(BSP_SPI_ENABLE_PORT1)
+static struct stm32_spi spi1 = {.hspi.Instance = SPI1}; 
+static struct rt_spi_bus spi1_bus = {.parent.user_data = &spi1}; 
 #endif
 
 static rt_uint32_t get_spi_clk_source_freq(SPI_HandleTypeDef *hspi)
 {
     rt_uint32_t freq = 0;
 
-#if defined(BSP_SPI_ENABLE_PORT3)
-    if(hspi->Instance == SPI3)
+#if defined(BSP_SPI_ENABLE_PORT1)
+    if(hspi->Instance == SPI1)
     {
-        PLL1_ClocksTypeDef pll1 = {0}; 
-        
-        HAL_RCCEx_GetPLL1ClockFreq(&pll1); 
-        freq = (rt_uint32_t)pll1.PLL1_Q_Frequency; 
+        freq = SystemCoreClock / 4;
     }
 #endif
-
-#if defined(BSP_SPI_ENABLE_PORT4)
-    if(hspi->Instance == SPI4)
-    {
-        PLL2_ClocksTypeDef pll2 = {0}; 
-        
-        HAL_RCCEx_GetPLL2ClockFreq(&pll2); 
-        freq = (rt_uint32_t)pll2.PLL2_Q_Frequency; 
-    }
-#endif 
 
     return freq; 
 }
@@ -172,13 +154,6 @@ static rt_err_t spi_init(SPI_HandleTypeDef *hspi, struct rt_spi_configuration *c
         hspi->Init.FirstBit = SPI_FIRSTBIT_LSB;
     }
 
-    /* SPI3强制为3线模式3WIRE */ 
-    if(hspi->Instance == SPI3)
-    {
-        LOG_D("SPI_DIRECTION_2LINES_TXONLY"); 
-        hspi->Init.Direction = SPI_DIRECTION_2LINES_TXONLY;
-    }
-    else
     {
         LOG_D("SPI_DIRECTION_2LINES"); 
         hspi->Init.Direction = SPI_DIRECTION_2LINES;
@@ -240,7 +215,8 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
 
     if (message->cs_take)
     {
-        rt_pin_write(cs->pin, PIN_LOW);
+        // rt_pin_write(cs->pin, PIN_LOW);
+        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
     }
     
     if(message->length == 0)
@@ -287,7 +263,8 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
 _ret:
     if (message->cs_release)
     {
-        rt_pin_write(cs->pin, PIN_HIGH);
+        // rt_pin_write(cs->pin, PIN_HIGH);
+        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
     }
 
     return length;
@@ -303,9 +280,17 @@ rt_err_t stm32_spi_bus_attach_device(const char *bus_name, const char *device_na
     struct stm32_spi_cs *cs_pin = (struct stm32_spi_cs *)rt_malloc(sizeof(struct stm32_spi_cs));
     RT_ASSERT(cs_pin != RT_NULL);
 
-    cs_pin->pin = pin;
-    rt_pin_mode(pin, PIN_MODE_OUTPUT);
-    rt_pin_write(pin, PIN_HIGH); 
+    GPIO_InitTypeDef gpio_init;
+    // cs_pin->pin = pin;
+    // rt_pin_mode(pin, PIN_MODE_OUTPUT);
+    // rt_pin_write(pin, PIN_HIGH); 
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* 设置推挽输出 */
+    gpio_init.Pull = GPIO_NOPULL;			/* 上下拉电阻不使能 */
+    gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIO速度等级 */	
+    gpio_init.Pin = GPIO_PIN_13;	
+    HAL_GPIO_Init(GPIOD, &gpio_init);	
  
     ret = rt_spi_bus_attach_device(spi_device, device_name, bus_name, (void *)cs_pin); 
     
@@ -318,68 +303,57 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
     
     LOG_D("HAL_SPI_MspInit"); 
    
-#if defined(BSP_SPI_ENABLE_PORT3)     
-    if(hspi->Instance == SPI3)
+#if defined(BSP_SPI_ENABLE_PORT1)     
+    if(hspi->Instance == SPI1)
     {
-        __HAL_RCC_SPI3_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
+        __HAL_RCC_SPI1_CLK_ENABLE();
+        __HAL_RCC_GPIOB_CLK_ENABLE();
 
-        GPIO_InitStruct.Pin       = GPIO_PIN_10 | GPIO_PIN_12;
+        GPIO_InitStruct.Pin       = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);  
-    }
-#endif
+        GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
     
-#if defined(BSP_SPI_ENABLE_PORT4)   
-    if(hspi->Instance == SPI4)
-    {
-        __HAL_RCC_SPI4_CLK_ENABLE();
-        __HAL_RCC_GPIOE_CLK_ENABLE();
-
-        GPIO_InitStruct.Pin       = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
-        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull      = GPIO_NOPULL;
-        GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF5_SPI4;
-        HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);  
     }
 #endif
 }
 
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
-#if defined(BSP_SPI_ENABLE_PORT3)     
-    if(hspi->Instance == SPI3)
+#if defined(BSP_SPI_ENABLE_PORT1)     
+    if(hspi->Instance == SPI1)
     {
-        __HAL_RCC_SPI3_CLK_DISABLE(); 
-        HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10 | GPIO_PIN_12);  
+        __HAL_RCC_SPI1_CLK_DISABLE(); 
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5);  
     }
 #endif
-    
-#if defined(BSP_SPI_ENABLE_PORT4)   
-    if(hspi->Instance == SPI4)
-    {
-        __HAL_RCC_SPI4_CLK_DISABLE();
-        HAL_GPIO_DeInit(GPIOE, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14);  
-    }
-#endif 
 }
 
 static struct rt_spi_ops ops = {configure, spixfer}; 
 
 int rt_hw_spi_init(void)
 {
-#if defined(BSP_SPI_ENABLE_PORT3) 
-    rt_spi_bus_register(&spi3_bus, "spi3", &ops); 
-#endif
-
-#if defined(BSP_SPI_ENABLE_PORT4)
-    rt_spi_bus_register(&spi4_bus, "spi4", &ops); 
+#if defined(BSP_SPI_ENABLE_PORT1) 
+    rt_spi_bus_register(&spi1_bus, "spi1", &ops); 
 #endif
 
     return RT_EOK; 
 }
 INIT_DEVICE_EXPORT(rt_hw_spi_init);
+
+
+static int rt_hw_spi_flash_init(void)
+{
+    // __HAL_RCC_GPIOD_CLK_ENABLE();
+    stm32_spi_bus_attach_device("spi1", "spi10", 64);
+
+    if (RT_NULL == rt_sfud_flash_probe("W25Q64JV", "spi10"))
+    {
+        return -RT_ERROR;
+    };
+
+    return RT_EOK;
+}
+INIT_COMPONENT_EXPORT(rt_hw_spi_flash_init);

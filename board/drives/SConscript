@@ -83,7 +83,10 @@ if GetDepend(['BSP_ENABLE_SDCARD']):
 
 if GetDepend(['BSP_ENABLE_SPI']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'spi')] 
+    CPPPATH += [os.path.join(GetCurrentDir(), 'flash')] 
     SOURCES += ['spi/drv_spi.c']
+    SOURCES += ['flash/drv_flash.c']  
+
 
 if GetDepend(['BSP_ENABLE_LCD']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'lcd')] 

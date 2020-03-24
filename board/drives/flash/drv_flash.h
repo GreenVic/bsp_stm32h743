@@ -14,6 +14,4 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
-int rt_hw_flash_init(void); 
-
 #endif

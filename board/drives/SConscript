@@ -65,10 +65,6 @@ LINKFLAGS        = ""
 # Feature clip configuration, optional 
 #---------------------------------------------------------------------------------
 
-if GetDepend(['RT_USING_DFS']) and GetDepend(['RT_USING_DFS_ROMFS']):
-    CPPPATH += [os.path.join(GetCurrentDir(), 'romfs')] 
-    SOURCES += ['romfs/drv_romfs.c']
-
 if GetDepend(['BSP_ENABLE_UART']):
     CPPPATH += [os.path.join(GetCurrentDir(), 'uart')] 
     SOURCES += ['uart/drv_usart.c']

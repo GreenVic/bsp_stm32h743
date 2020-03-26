@@ -12,7 +12,7 @@
 #include <dfs_posix.h>
 #endif
 
-rt_err_t rtquick_mnt_init(void)
+rt_err_t mnt_init(void)
 {
     rt_err_t ret = RT_EOK; 
 

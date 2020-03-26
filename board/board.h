@@ -31,14 +31,6 @@
 #include "drv_lcd.h"
 #endif 
 
-#if defined(BSP_ENABLE_WIFI)
-#include "drv_wifi.h"
-#endif 
-
-#if defined(BSP_ENABLE_PSRAM)
-#include "drv_psram.h"
-#endif 
-
 #if defined(BSP_ENABLE_SDRAM)
 #include "drv_sdram.h"
 #endif 

@@ -239,3 +239,9 @@ void rt_hw_board_init(void)
     rt_system_heap_init(BOARD_HEAP_BEGIN, BOARD_HEAP_END);
 #endif
 }
+
+void reboot(void)
+{
+	NVIC_SystemReset();
+}
+MSH_CMD_EXPORT(reboot, reboot);
